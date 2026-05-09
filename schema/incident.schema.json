@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/plexusone/incident-lifecycle-spec/schema/incident.schema.json",
+  "title": "Incident Lifecycle",
+  "description": "A unified schema for incident lifecycle management spanning premortem, intra-mortem, and postmortem phases",
+  "type": "object",
+  "required": ["incident_id", "title", "phase", "severity", "created_at"],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "Unique identifier for this incident"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title describing the incident"
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["premortem", "intra_mortem", "postmortem"],
+      "description": "Current lifecycle phase of this incident artifact"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["SEV0", "SEV1", "SEV2", "SEV3"],
+      "description": "Incident severity level"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["hypothetical", "investigating", "identified", "mitigating", "resolved", "closed"],
+      "description": "Current incident status"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this artifact was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this artifact was last updated"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the incident started (null for premortem)"
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the incident was detected"
+    },
+    "mitigated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the incident was mitigated"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the incident was fully resolved"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Current understanding of what happened or could happen"
+    },
+    "services_affected": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of affected service names"
+    },
+    "customer_impact_summary": {
+      "type": "string",
+      "description": "Human-readable description of customer impact"
+    },
+    "customer_impact_scope": {
+      "type": "string",
+      "enum": ["none", "minimal", "partial", "significant", "total"],
+      "description": "Scope of customer impact"
+    },
+    "internal_impact_summary": {
+      "type": "string",
+      "description": "Human-readable description of internal impact"
+    },
+    "detection_method": {
+      "type": "string",
+      "enum": ["monitoring", "customer_report", "employee_report", "automated", "other"],
+      "description": "How the incident was detected"
+    },
+    "detection_details": {
+      "type": "string",
+      "description": "Details about how detection occurred"
+    },
+    "root_cause": {
+      "type": "string",
+      "description": "Primary root cause (populated in postmortem phase)"
+    },
+    "contributing_factors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Factors that contributed to the incident"
+    },
+    "prevention_gaps": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Why the incident was not prevented"
+    },
+    "resolution_summary": {
+      "type": "string",
+      "description": "How the incident was resolved"
+    },
+    "what_went_well": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Things that worked well during the incident"
+    },
+    "what_went_wrong": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Things that did not work well during the incident"
+    },
+    "lessons_learned": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Key takeaways from this incident"
+    },
+    "related_incident_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "IDs of related incidents"
+    },
+    "timeline": {
+      "type": "array",
+      "description": "Chronological sequence of events",
+      "items": { "$ref": "#/$defs/TimelineEvent" }
+    },
+    "hypotheses": {
+      "type": "array",
+      "description": "Hypotheses about cause or risk (premortem: failure modes, intra/post: root cause candidates)",
+      "items": { "$ref": "#/$defs/Hypothesis" }
+    },
+    "action_items": {
+      "type": "array",
+      "description": "Tasks to prevent recurrence or mitigate risk",
+      "items": { "$ref": "#/$defs/ActionItem" }
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Supporting evidence (logs, traces, screenshots)",
+      "items": { "$ref": "#/$defs/Evidence" }
+    }
+  },
+  "$defs": {
+    "TimelineEvent": {
+      "type": "object",
+      "required": ["event_id", "timestamp", "description"],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Unique identifier for this event"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this event occurred"
+        },
+        "description": {
+          "type": "string",
+          "description": "What happened"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["monitoring", "human", "customer", "agent", "automated", "other"],
+          "description": "Source of this event"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["confirmed", "likely", "suspected", "unconfirmed"],
+          "description": "Confidence level in this event"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of supporting evidence"
+        }
+      }
+    },
+    "Hypothesis": {
+      "type": "object",
+      "required": ["hypothesis_id", "description", "status"],
+      "properties": {
+        "hypothesis_id": {
+          "type": "string",
+          "description": "Unique identifier for this hypothesis"
+        },
+        "description": {
+          "type": "string",
+          "description": "What we think might be true"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "investigating", "validated", "invalidated"],
+          "description": "Current status of this hypothesis"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score (0-1)"
+        },
+        "validated_by_event_id": {
+          "type": "string",
+          "description": "Timeline event ID that validated/invalidated this hypothesis"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of supporting evidence"
+        }
+      }
+    },
+    "ActionItem": {
+      "type": "object",
+      "required": ["action_id", "description", "priority", "status"],
+      "properties": {
+        "action_id": {
+          "type": "string",
+          "description": "Unique identifier for this action"
+        },
+        "description": {
+          "type": "string",
+          "description": "What needs to be done"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Person or team responsible"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["P0", "P1", "P2", "P3"],
+          "description": "Priority level"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "in_progress", "done", "wont_do"],
+          "description": "Current status"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Target completion date"
+        },
+        "related_hypothesis_id": {
+          "type": "string",
+          "description": "Hypothesis this action addresses"
+        }
+      }
+    },
+    "Evidence": {
+      "type": "object",
+      "required": ["evidence_id", "evidence_type", "description"],
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "description": "Unique identifier for this evidence"
+        },
+        "evidence_type": {
+          "type": "string",
+          "enum": ["log", "trace", "metric", "screenshot", "document", "other"],
+          "description": "Type of evidence"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this evidence shows"
+        },
+        "source": {
+          "type": "string",
+          "description": "Where this evidence came from (e.g., datadog, splunk)"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the evidence"
+        },
+        "collected_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this evidence was collected"
+        }
+      }
+    }
+  }
+}
