@@ -58,7 +58,7 @@ You can override the template with --template.`,
 			}
 
 			if outputFile != "" {
-				if err := os.WriteFile(outputFile, []byte(output), 0644); err != nil {
+				if err := os.WriteFile(outputFile, []byte(output), 0600); err != nil {
 					return fmt.Errorf("writing output: %w", err)
 				}
 				fmt.Fprintf(os.Stderr, "Wrote %s\n", outputFile)

@@ -7,9 +7,9 @@ import "time"
 type Phase string
 
 const (
-	PhasePremortem  Phase = "premortem"
+	PhasePremortem   Phase = "premortem"
 	PhaseIntraMortem Phase = "intra_mortem"
-	PhasePostmortem Phase = "postmortem"
+	PhasePostmortem  Phase = "postmortem"
 )
 
 // Severity represents the incident severity level.
@@ -42,19 +42,19 @@ type Incident struct {
 	Severity   Severity `json:"severity"`
 	Status     Status   `json:"status,omitempty"`
 
-	CreatedAt  *time.Time `json:"created_at"`
-	UpdatedAt  *time.Time `json:"updated_at,omitempty"`
-	StartedAt  *time.Time `json:"started_at,omitempty"`
-	DetectedAt *time.Time `json:"detected_at,omitempty"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
+	StartedAt   *time.Time `json:"started_at,omitempty"`
+	DetectedAt  *time.Time `json:"detected_at,omitempty"`
 	MitigatedAt *time.Time `json:"mitigated_at,omitempty"`
-	ResolvedAt *time.Time `json:"resolved_at,omitempty"`
+	ResolvedAt  *time.Time `json:"resolved_at,omitempty"`
 
 	Summary          string   `json:"summary,omitempty"`
 	ServicesAffected []string `json:"services_affected,omitempty"`
 
-	CustomerImpactSummary string       `json:"customer_impact_summary,omitempty"`
-	CustomerImpactScope   ImpactScope  `json:"customer_impact_scope,omitempty"`
-	InternalImpactSummary string       `json:"internal_impact_summary,omitempty"`
+	CustomerImpactSummary string      `json:"customer_impact_summary,omitempty"`
+	CustomerImpactScope   ImpactScope `json:"customer_impact_scope,omitempty"`
+	InternalImpactSummary string      `json:"internal_impact_summary,omitempty"`
 
 	DetectionMethod  DetectionMethod `json:"detection_method,omitempty"`
 	DetectionDetails string          `json:"detection_details,omitempty"`
@@ -91,11 +91,11 @@ const (
 type DetectionMethod string
 
 const (
-	DetectionMonitoring      DetectionMethod = "monitoring"
-	DetectionCustomerReport  DetectionMethod = "customer_report"
-	DetectionEmployeeReport  DetectionMethod = "employee_report"
-	DetectionAutomated       DetectionMethod = "automated"
-	DetectionOther           DetectionMethod = "other"
+	DetectionMonitoring     DetectionMethod = "monitoring"
+	DetectionCustomerReport DetectionMethod = "customer_report"
+	DetectionEmployeeReport DetectionMethod = "employee_report"
+	DetectionAutomated      DetectionMethod = "automated"
+	DetectionOther          DetectionMethod = "other"
 )
 
 // TimelineEvent represents a single event in the incident timeline.
