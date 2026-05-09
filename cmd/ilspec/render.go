@@ -57,20 +57,21 @@ You can override the template with --template.`,
 				return fmt.Errorf("rendering: %w", err)
 			}
 
-			if outputFile != "" {
-				if err := os.WriteFile(outputFile, []byte(output), 0600); err != nil {
+			outFile := outputFilename(outputFile, inputFile, incident.Phase)
+			if outFile == "-" {
+				fmt.Print(output)
+			} else {
+				if err := os.WriteFile(outFile, []byte(output), 0600); err != nil {
 					return fmt.Errorf("writing output: %w", err)
 				}
-				fmt.Fprintf(os.Stderr, "Wrote %s\n", outputFile)
-			} else {
-				fmt.Print(output)
+				fmt.Fprintf(os.Stderr, "Wrote %s\n", outFile)
 			}
 
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVarP(&outputFile, "output", "o", "", "Output file (default: stdout)")
+	cmd.Flags().StringVarP(&outputFile, "output", "o", "", "Output file (default: auto-generated, use '-' for stdout)")
 	cmd.Flags().StringVarP(&templateName, "template", "t", "", "Template name (default: auto-detect from phase)")
 	cmd.Flags().StringVar(&templateDir, "template-dir", "", "Directory containing custom templates")
 
@@ -90,8 +91,13 @@ func templateForPhase(phase types.Phase) string {
 	}
 }
 
-// suggestOutputFile suggests an output filename based on input and phase.
-func suggestOutputFile(inputFile string, phase types.Phase) string {
+// outputFilename returns the output filename, auto-generating one if not specified.
+// Use "-" for explicit stdout.
+func outputFilename(specified, inputFile string, phase types.Phase) string {
+	if specified != "" {
+		return specified
+	}
+	// Auto-generate based on input filename and phase
 	base := filepath.Base(inputFile)
 	ext := filepath.Ext(base)
 	name := base[:len(base)-len(ext)]
@@ -101,6 +107,8 @@ func suggestOutputFile(inputFile string, phase types.Phase) string {
 		return name + "-update.md"
 	case types.PhasePostmortem:
 		return name + "-postmortem.md"
+	case types.PhasePremortem:
+		return name + "-premortem.md"
 	default:
 		return name + ".md"
 	}
