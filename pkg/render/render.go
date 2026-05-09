@@ -69,6 +69,11 @@ func LoadIncidentFromReader(r io.Reader) (*types.Incident, error) {
 	return &incident, nil
 }
 
+// RenderPremortem renders an incident as a premortem risk assessment.
+func (r *Renderer) RenderPremortem(incident *types.Incident) (string, error) {
+	return r.render("premortem.md.tmpl", incident)
+}
+
 // RenderIntraMortem renders an incident as an intra-mortem update.
 func (r *Renderer) RenderIntraMortem(incident *types.Incident) (string, error) {
 	return r.render("intra-mortem.md.tmpl", incident)

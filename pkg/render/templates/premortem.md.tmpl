@@ -1,0 +1,85 @@
+# Premortem: {{.Title}}
+
+**Incident ID:** {{.IncidentID}}
+**Severity:** {{.Severity}}
+**Status:** {{.Status}}
+**Created:** {{.FormattedCreatedAt}}
+
+---
+
+## Summary
+
+{{.Summary}}
+
+---
+
+## Services at Risk
+{{range .ServicesAffected}}
+- {{.}}
+{{else}}
+_None identified_
+{{end}}
+
+---
+
+## Failure Scenarios
+{{range .Hypotheses}}
+- **{{.Description}}** (likelihood: {{printf "%.0f" (mulf .Confidence 100)}}%)
+{{else}}
+_No failure scenarios documented_
+{{end}}
+
+---
+
+## Early Warning Signals
+
+What signals would indicate this failure is occurring?
+
+{{range .Timeline}}
+- {{.Description}}
+{{else}}
+_No early warning signals documented_
+{{end}}
+
+---
+
+## Prevention Gaps
+{{range .PreventionGaps}}
+- {{.}}
+{{else}}
+_No prevention gaps identified_
+{{end}}
+
+---
+
+## Recommended Mitigations
+
+| Action | Owner | Priority | Status |
+|--------|-------|----------|--------|
+{{range .ActionItems -}}
+| {{.Description}} | {{.Owner}} | {{.Priority}} | {{.Status}} |
+{{else}}
+| _No mitigations recommended_ | - | - | - |
+{{end}}
+
+---
+
+## Assumptions at Risk
+{{range .ContributingFactors}}
+- {{.}}
+{{else}}
+_No risky assumptions documented_
+{{end}}
+
+---
+
+## Evidence / References
+{{range .Evidence}}
+- **{{.EvidenceType}}**: {{.Description}}{{if .URL}} ([source]({{.URL}})){{end}}
+{{else}}
+_No supporting evidence_
+{{end}}
+
+---
+
+_Last updated: {{.FormattedUpdatedAt}}_
