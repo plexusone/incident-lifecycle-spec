@@ -109,6 +109,22 @@ go build -o ilspec ./cmd/ilspec
 
 ## Usage
 
+### Initialize a new incident
+
+```bash
+# Create intra-mortem incident (default)
+ilspec init --title "Database outage" --severity SEV1
+
+# Create premortem for failure simulation
+ilspec init -p premortem -s SEV2 -t "Failover risk analysis"
+
+# Create postmortem
+ilspec init -p postmortem -s SEV0 -t "Auth service outage" -o postmortem.json
+
+# Output to stdout
+ilspec init -p intra_mortem -s SEV1 -t "API failures" -o -
+```
+
 ### Render an incident to Markdown
 
 ```bash
@@ -132,8 +148,11 @@ ilspec render incident.json --template-dir ./my-templates
 ### Validate an incident file
 
 ```bash
-# Validate incident JSON
+# Full validation (schema + Go type validation)
 ilspec validate incident.json
+
+# Schema validation only
+ilspec validate --schema-only incident.json
 
 # Quiet mode (no output on success)
 ilspec validate incident.json -q
@@ -264,16 +283,23 @@ incident-lifecycle-spec/
 ├── pkg/
 │   ├── types/
 │   │   └── incident.go         # Go types
-│   └── render/
-│       ├── render.go           # Renderer
-│       └── templates/
-│           ├── intra-mortem.md.tmpl
-│           └── postmortem.md.tmpl
+│   ├── render/
+│   │   ├── render.go           # Renderer
+│   │   └── templates/
+│   │       ├── intra-mortem.md.tmpl
+│   │       ├── postmortem.md.tmpl
+│   │       └── premortem.md.tmpl
+│   └── schema/
+│       └── schema.go           # Embedded schema validator
 ├── cmd/ilspec/
 │   ├── main.go
-│   └── render.go
+│   ├── init.go
+│   ├── render.go
+│   └── validate.go
 ├── examples/
-│   └── intra-mortem-example.json
+│   ├── intra-mortem-example.json
+│   ├── premortem-example.json
+│   └── postmortem-example.json
 ├── DESIGN_PRINCIPLES.md
 └── README.md
 ```
