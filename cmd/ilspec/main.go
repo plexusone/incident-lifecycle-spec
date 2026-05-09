@@ -20,6 +20,7 @@ func main() {
 	rootCmd.AddCommand(initCmd())
 	rootCmd.AddCommand(renderCmd())
 	rootCmd.AddCommand(validateCmd())
+	rootCmd.AddCommand(visualizeCmd())
 	rootCmd.AddCommand(versionCmd())
 
 	if err := rootCmd.Execute(); err != nil {
