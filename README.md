@@ -73,12 +73,12 @@ Reconstruct truth and extract learning.
 ## Architecture: One Truth, Many Views
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                  Incident JSON                          │
-│            (single evolving artifact)                   │
-│                                                         │
-│  phase: premortem | intra_mortem | postmortem          │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────┐
+│                  Incident JSON                     │
+│            (single evolving artifact)              │
+│                                                    │
+│  phase: premortem | intra_mortem | postmortem      │
+└────────────────────────────────────────────────────┘
                           │
           ┌───────────────┼───────────────┐
           ▼               ▼               ▼
