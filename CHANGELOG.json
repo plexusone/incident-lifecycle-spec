@@ -7,6 +7,30 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.2.0",
+      "date": "2026-05-09",
+      "highlights": [
+        { "description": "`ilspec validate` command for validating incident JSON files" },
+        { "description": "Premortem template for proactive failure simulation" },
+        { "description": "Unit tests for types and render packages" }
+      ],
+      "added": [
+        { "description": "`ilspec validate` command with required field and enum validation", "commit": "b0b49ce" },
+        { "description": "Premortem Markdown template with failure scenarios, early warning signals, and mitigations", "commit": "ce47e86" },
+        { "description": "`RenderPremortem()` method in render package", "commit": "ce47e86" }
+      ],
+      "tests": [
+        { "description": "Unit tests for types package: JSON round-trip, enum values", "commit": "75beb63" },
+        { "description": "Unit tests for render package: template rendering, view helpers", "commit": "75beb63" }
+      ],
+      "documentation": [
+        { "description": "README updated with validate command usage", "commit": "7d6b397" }
+      ],
+      "build": [
+        { "description": "GoReleaser configuration for cross-platform binary releases", "commit": "1521fca" }
+      ]
+    },
+    {
       "version": "v0.1.0",
       "date": "2026-05-09",
       "commit": "547a54a",
