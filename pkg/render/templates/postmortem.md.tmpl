@@ -1,0 +1,127 @@
+# Postmortem: {{.Title}}
+
+**Incident ID:** {{.IncidentID}}
+**Severity:** {{.Severity}}
+**Duration:** {{.FormattedStartedAt}} - {{.FormattedResolvedAt}}
+
+---
+
+## Summary
+
+{{.Summary}}
+
+---
+
+## Customer Impact
+
+{{.CustomerImpactSummary}}
+
+**Scope:** {{.CustomerImpactScope}}
+
+---
+
+## Services Affected
+{{range .ServicesAffected}}
+- {{.}}
+{{end}}
+
+---
+
+## Timeline
+
+| Time | Event |
+|------|-------|
+{{range .Timeline -}}
+| {{.Timestamp.Format "2006-01-02 15:04:05"}} | {{.Description}} |
+{{end}}
+
+---
+
+## Root Cause
+
+{{.RootCause}}
+
+---
+
+## Contributing Factors
+{{range .ContributingFactors}}
+- {{.}}
+{{else}}
+_None identified_
+{{end}}
+
+---
+
+## Why It Was Not Prevented
+{{range .PreventionGaps}}
+- {{.}}
+{{else}}
+_Not analyzed_
+{{end}}
+
+---
+
+## Detection
+
+**Method:** {{.DetectionMethod}}
+
+{{.DetectionDetails}}
+
+---
+
+## Resolution
+
+{{.ResolutionSummary}}
+
+---
+
+## What Went Well
+{{range .WhatWentWell}}
+- {{.}}
+{{else}}
+_Not documented_
+{{end}}
+
+---
+
+## What Went Wrong
+{{range .WhatWentWrong}}
+- {{.}}
+{{else}}
+_Not documented_
+{{end}}
+
+---
+
+## Action Items
+
+| Task | Owner | Priority | Due Date | Status |
+|------|-------|----------|----------|--------|
+{{range .ActionItems -}}
+| {{.Description}} | {{.Owner}} | {{.Priority}} | {{.DueDate}} | {{.Status}} |
+{{end}}
+
+---
+
+## Lessons Learned
+{{range .LessonsLearned}}
+- {{.}}
+{{else}}
+_Not documented_
+{{end}}
+
+---
+
+## Related Incidents
+{{range .RelatedIncidentIDs}}
+- {{.}}
+{{else}}
+_None_
+{{end}}
+
+---
+
+## Evidence
+{{range .Evidence}}
+- **{{.EvidenceType}}**: {{.Description}}{{if .URL}} ([source]({{.URL}})){{end}}
+{{end}}

@@ -1,0 +1,88 @@
+# Incident Update: {{.Title}}
+
+**Incident ID:** {{.IncidentID}}
+**Status:** {{.Status}}
+**Severity:** {{.Severity}}
+**Last Updated:** {{.FormattedUpdatedAt}}
+
+---
+
+## Current Summary
+
+{{.Summary}}
+
+---
+
+## Customer Impact
+
+{{.CustomerImpactSummary}}
+
+**Scope:** {{.CustomerImpactScope}}
+
+---
+
+## Services Affected
+{{range .ServicesAffected}}
+- {{.}}
+{{else}}
+_None identified yet_
+{{end}}
+
+---
+
+## What We Know (Confirmed)
+{{range .ConfirmedFacts}}
+- {{.}}
+{{else}}
+_No confirmed facts yet_
+{{end}}
+
+---
+
+## Active Hypotheses
+{{range .ActiveHypotheses}}
+- **{{.Description}}** (confidence: {{printf "%.0f" (mulf .Confidence 100)}}%)
+{{else}}
+_No active hypotheses_
+{{end}}
+
+---
+
+## Mitigations in Progress
+{{range .InProgressActions}}
+- {{.Description}} (owner: {{.Owner}})
+{{else}}
+_No mitigations in progress_
+{{end}}
+
+---
+
+## Timeline
+
+| Time | Event | Confidence |
+|------|-------|------------|
+{{range .Timeline -}}
+| {{.Timestamp.Format "15:04:05"}} | {{.Description}} | {{.Confidence}} |
+{{end}}
+
+---
+
+## Evidence Collected
+{{range .Evidence}}
+- **{{.EvidenceType}}**: {{.Description}}{{if .URL}} ([source]({{.URL}})){{end}}
+{{else}}
+_No evidence collected yet_
+{{end}}
+
+---
+
+## Risks / Unknowns
+{{range .ProposedHypotheses}}
+- {{.Description}}
+{{else}}
+_None identified_
+{{end}}
+
+---
+
+_Next update expected at: TBD_
