@@ -1,0 +1,36 @@
+{
+  "irVersion": "1.0",
+  "project": "incident-lifecycle-spec",
+  "repository": "https://github.com/plexusone/incident-lifecycle-spec",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["grokify", "johncwang@gmail.com"],
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-05-09",
+      "commit": "547a54a",
+      "highlights": [
+        { "description": "Unified incident lifecycle schema spanning premortem, intra-mortem, and postmortem phases" },
+        { "description": "CLI tool for rendering incident JSON to Markdown with phase-aware template selection" }
+      ],
+      "added": [
+        { "description": "JSON Schema for incident lifecycle artifacts with timeline, hypotheses, action items, and evidence", "commit": "4c828b7" },
+        { "description": "Go types matching schema with type-safe enums for phase, severity, status, and confidence levels", "commit": "47ad817" },
+        { "description": "Markdown renderer with embedded templates for intra-mortem and postmortem phases", "commit": "cb201a4" },
+        { "description": "View helpers: `ConfirmedFacts()`, `ActiveHypotheses()`, `InProgressActions()` for template filtering", "commit": "cb201a4" },
+        { "description": "`ilspec render` command with auto-detection of template based on incident phase", "commit": "e918402" },
+        { "description": "`--output` flag for writing rendered Markdown to file", "commit": "e918402" },
+        { "description": "`--template-dir` flag for custom template directories", "commit": "e918402" }
+      ],
+      "documentation": [
+        { "description": "README with lifecycle model explanation, architecture diagram, and usage instructions", "commit": "99a1ea2" },
+        { "description": "DESIGN_PRINCIPLES covering schema navigability, nesting limits, and schemakit integration", "commit": "99a1ea2" },
+        { "description": "Example intra-mortem incident JSON demonstrating schema usage", "commit": "7bda137" }
+      ],
+      "internal": [
+        { "description": "Go module initialization with cobra dependency", "commit": "547a54a" }
+      ]
+    }
+  ]
+}
