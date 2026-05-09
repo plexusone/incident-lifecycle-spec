@@ -1,0 +1,132 @@
+{
+  "incident_id": "INC-2024-0042",
+  "title": "Payment processing failures in US-West region",
+  "phase": "intra_mortem",
+  "severity": "SEV1",
+  "status": "mitigating",
+  "created_at": "2024-03-15T14:30:00Z",
+  "updated_at": "2024-03-15T15:45:00Z",
+  "started_at": "2024-03-15T14:22:00Z",
+  "detected_at": "2024-03-15T14:30:00Z",
+  "summary": "Payment transactions failing with timeout errors in US-West region. Approximately 30% of transactions affected. Issue isolated to connection pool exhaustion on payment-gateway-west-2.",
+  "services_affected": [
+    "payment-gateway",
+    "checkout-service",
+    "order-service"
+  ],
+  "customer_impact_summary": "Customers in US-West region experiencing payment failures. Retry usually succeeds on second attempt.",
+  "customer_impact_scope": "partial",
+  "internal_impact_summary": "On-call team engaged. Payment operations team monitoring transaction success rates.",
+  "detection_method": "monitoring",
+  "detection_details": "PagerDuty alert triggered on payment_success_rate < 95% threshold",
+  "timeline": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2024-03-15T14:22:00Z",
+      "description": "First payment timeout errors appear in logs",
+      "source": "monitoring",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2024-03-15T14:30:00Z",
+      "description": "PagerDuty alert fires, on-call engineer paged",
+      "source": "automated",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2024-03-15T14:35:00Z",
+      "description": "Initial investigation shows connection pool at 100% utilization",
+      "source": "human",
+      "confidence": "confirmed",
+      "evidence_ids": ["evi-001"]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2024-03-15T14:45:00Z",
+      "description": "Identified spike in long-running transactions from partner API",
+      "source": "human",
+      "confidence": "likely",
+      "evidence_ids": ["evi-002"]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2024-03-15T15:00:00Z",
+      "description": "Increased connection pool size from 50 to 100 on payment-gateway-west-2",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2024-03-15T15:15:00Z",
+      "description": "Transaction success rate recovering, now at 92%",
+      "source": "monitoring",
+      "confidence": "confirmed"
+    }
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "hyp-001",
+      "description": "Connection pool exhaustion caused by slow partner API responses",
+      "status": "investigating",
+      "confidence": 0.75,
+      "evidence_ids": ["evi-001", "evi-002"]
+    },
+    {
+      "hypothesis_id": "hyp-002",
+      "description": "Memory leak in payment-gateway causing connection accumulation",
+      "status": "invalidated",
+      "confidence": 0.1,
+      "validated_by_event_id": "evt-003"
+    },
+    {
+      "hypothesis_id": "hyp-003",
+      "description": "Partner API may have deployed a change causing latency increase",
+      "status": "proposed",
+      "confidence": 0.5
+    }
+  ],
+  "action_items": [
+    {
+      "action_id": "act-001",
+      "description": "Increase connection pool size to 100",
+      "owner": "oncall-engineer",
+      "priority": "P0",
+      "status": "done"
+    },
+    {
+      "action_id": "act-002",
+      "description": "Contact partner API team to investigate latency spike",
+      "owner": "oncall-engineer",
+      "priority": "P1",
+      "status": "in_progress"
+    },
+    {
+      "action_id": "act-003",
+      "description": "Add circuit breaker for partner API calls",
+      "owner": "platform-team",
+      "priority": "P2",
+      "status": "open",
+      "related_hypothesis_id": "hyp-001"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "evi-001",
+      "evidence_type": "metric",
+      "description": "Connection pool utilization at 100% for 8 minutes",
+      "source": "datadog",
+      "url": "https://app.datadoghq.com/dashboard/abc123?from=1710513720000",
+      "collected_at": "2024-03-15T14:40:00Z"
+    },
+    {
+      "evidence_id": "evi-002",
+      "evidence_type": "trace",
+      "description": "Trace showing partner API calls taking 30s+ vs normal 500ms",
+      "source": "datadog",
+      "url": "https://app.datadoghq.com/apm/trace/xyz789",
+      "collected_at": "2024-03-15T14:50:00Z"
+    }
+  ]
+}
