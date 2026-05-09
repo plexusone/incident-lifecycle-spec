@@ -1,0 +1,57 @@
+version: 2
+
+project_name: ilspec
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: ilspec
+    main: ./cmd/ilspec
+    binary: ilspec
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  use: github-native
+
+brews:
+  - name: ilspec
+    repository:
+      owner: plexusone
+      name: homebrew-tap
+    homepage: "https://github.com/plexusone/incident-lifecycle-spec"
+    description: "Incident lifecycle specification tools"
+    license: "MIT"
+    skip_upload: auto
+
+release:
+  github:
+    owner: plexusone
+    name: incident-lifecycle-spec
+  draft: false
+  prerelease: auto
