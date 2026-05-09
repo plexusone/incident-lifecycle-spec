@@ -129,7 +129,17 @@ ilspec render incident.json --template postmortem.md.tmpl
 ilspec render incident.json --template-dir ./my-templates
 ```
 
-### Validate schema (using schemakit)
+### Validate an incident file
+
+```bash
+# Validate incident JSON
+ilspec validate incident.json
+
+# Quiet mode (no output on success)
+ilspec validate incident.json -q
+```
+
+### Validate schema definition (using schemakit)
 
 ```bash
 schemakit lint --property-case snake_case schema/incident.schema.json
