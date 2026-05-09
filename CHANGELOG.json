@@ -20,7 +20,8 @@
         { "description": "Markdown renderer with embedded templates for intra-mortem and postmortem phases", "commit": "cb201a4" },
         { "description": "View helpers: `ConfirmedFacts()`, `ActiveHypotheses()`, `InProgressActions()` for template filtering", "commit": "cb201a4" },
         { "description": "`ilspec render` command with auto-detection of template based on incident phase", "commit": "e918402" },
-        { "description": "`--output` flag for writing rendered Markdown to file", "commit": "e918402" },
+        { "description": "Auto-generated output filenames based on phase (e.g., `incident-update.md` for intra-mortem)", "commit": "b7eafac" },
+        { "description": "`--output` flag for explicit output file, use `-` for stdout", "commit": "b7eafac" },
         { "description": "`--template-dir` flag for custom template directories", "commit": "e918402" }
       ],
       "documentation": [

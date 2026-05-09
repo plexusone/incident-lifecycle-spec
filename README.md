@@ -112,11 +112,15 @@ go build -o ilspec ./cmd/ilspec
 ### Render an incident to Markdown
 
 ```bash
-# Auto-detect template based on phase
+# Auto-generates output filename based on phase
+# incident.json (intra_mortem) → incident-update.md
 ilspec render incident.json
 
-# Write to file
-ilspec render incident.json -o update.md
+# Explicit output filename
+ilspec render incident.json -o custom-name.md
+
+# Output to stdout
+ilspec render incident.json -o -
 
 # Use specific template
 ilspec render incident.json --template postmortem.md.tmpl
