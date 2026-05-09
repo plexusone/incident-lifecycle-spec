@@ -18,6 +18,7 @@ func main() {
 	}
 
 	rootCmd.AddCommand(renderCmd())
+	rootCmd.AddCommand(validateCmd())
 	rootCmd.AddCommand(versionCmd())
 
 	if err := rootCmd.Execute(); err != nil {
