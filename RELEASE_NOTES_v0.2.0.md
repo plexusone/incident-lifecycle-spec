@@ -2,27 +2,53 @@
 
 ## Overview
 
-This release adds the **validate command**, **premortem template**, and **unit tests** to incident-lifecycle-spec. It also includes GoReleaser configuration for cross-platform binary distribution.
+This release adds scaffolding, JSON Schema validation, premortem templates, comprehensive tests, and complete examples for all lifecycle phases.
 
 ## Highlights
 
+- `ilspec init` command for scaffolding new incidents with phase-aware templates
+- JSON Schema runtime validation with embedded schema
 - `ilspec validate` command for validating incident JSON files
 - Premortem template for proactive failure simulation
-- Comprehensive unit tests for types and render packages
-- GoReleaser configuration for binary releases
+- Complete example incidents for all phases (premortem, intra-mortem, postmortem)
 
 ## New Features
 
-### Validate Command
+### Init Command
 
-Validate incident JSON files against the schema:
+Scaffold new incident JSON files with phase-appropriate defaults:
 
 ```bash
-# Validate an incident file
+# Create intra-mortem incident
+ilspec init --phase intra_mortem --severity SEV1 --title "Database outage"
+
+# Create premortem for failure simulation
+ilspec init -p premortem -s SEV2 -t "Failover risk analysis" -o risk.json
+
+# Output to stdout
+ilspec init -p postmortem -s SEV0 -t "Auth service outage" -o -
+```
+
+Auto-generates:
+
+- Incident ID based on timestamp (e.g., `INC-2024-0515-143022`)
+- Phase-appropriate status (`hypothetical` for premortem, `investigating` for intra-mortem)
+- Placeholder content for required sections
+- Default filename based on phase (e.g., `premortem-2024-05-15.json`)
+
+### JSON Schema Validation
+
+Validate incidents against the embedded JSON Schema:
+
+```bash
+# Full validation (schema + Go type validation)
 ilspec validate incident.json
 
+# Schema validation only
+ilspec validate --schema-only incident.json
+
 # Quiet mode (exit code only)
-ilspec validate incident.json -q
+ilspec validate -q incident.json
 ```
 
 Validates:
@@ -30,6 +56,7 @@ Validates:
 - Required fields: `incident_id`, `title`, `phase`, `severity`, `created_at`
 - Valid enum values for `phase`, `severity`, `status`
 - Required fields in `timeline`, `hypotheses`, `action_items`, `evidence` arrays
+- JSON structure against schema
 
 Example output:
 
@@ -57,21 +84,54 @@ The premortem template includes:
 - **Recommended Mitigations** — Actions to reduce risk
 - **Risky Assumptions** — Assumptions that could prove false
 
-### Unit Tests
+### Complete Examples
 
-Comprehensive test coverage for core packages:
+All lifecycle phases now have complete example JSON files:
 
-**Types package:**
+| Phase | Example | Description |
+|-------|---------|-------------|
+| Premortem | `examples/premortem-example.json` | Database failover risk analysis |
+| Intra-Mortem | `examples/intra-mortem-example.json` | Payment service outage (active) |
+| Postmortem | `examples/postmortem-example.json` | Auth service certificate expiration |
 
-- JSON round-trip serialization
-- Enum value correctness (Phase, Severity, Status, etc.)
+## API
 
-**Render package:**
+### pkg/schema
 
-- Renderer initialization
-- Template rendering (intra-mortem, postmortem)
-- View helper methods (`ConfirmedFacts()`, `ActiveHypotheses()`, etc.)
-- `LoadIncidentFromReader()`
+New package for JSON Schema validation:
+
+```go
+import "github.com/plexusone/incident-lifecycle-spec/pkg/schema"
+
+// Create validator with embedded schema
+validator, err := schema.NewValidator()
+
+// Simple validation
+err = validator.ValidateBytes(jsonData)
+
+// Detailed validation with paths
+errors, err := validator.ValidateBytesDetailed(jsonData)
+for _, e := range errors {
+    fmt.Printf("%s: %s\n", e.Path, e.Message)
+}
+
+// Access raw schema
+schemaJSON := schema.IncidentSchemaJSON()
+```
+
+## Testing
+
+Comprehensive test coverage for all packages:
+
+**CLI tests:**
+
+- `cmd/ilspec/validate_test.go` — Validation logic tests (required fields, enums, nested structures)
+
+**Package tests:**
+
+- `pkg/schema/schema_test.go` — Schema validator tests
+- `pkg/types/types_test.go` — JSON round-trip, enum values
+- `pkg/render/render_test.go` — Template rendering, view helpers
 
 Run tests:
 
@@ -79,9 +139,9 @@ Run tests:
 go test -v ./...
 ```
 
-### GoReleaser Configuration
+## Build
 
-Cross-platform binary releases:
+GoReleaser configuration supports cross-platform binaries:
 
 - **Platforms:** Linux, macOS, Windows
 - **Architectures:** amd64, arm64
@@ -91,6 +151,9 @@ Cross-platform binary releases:
 ## CLI Summary
 
 ```bash
+# Initialize new incident file
+ilspec init -p intra_mortem -s SEV1 -t "Incident title"
+
 # Render incident to Markdown (auto-generated filename)
 ilspec render incident.json
 
@@ -100,12 +163,26 @@ ilspec render incident.json -o -
 # Validate incident JSON
 ilspec validate incident.json
 
+# Schema-only validation
+ilspec validate --schema-only incident.json
+
 # Version
 ilspec version
 ```
 
+## What's Next
+
+- Hypothesis lifecycle tracking visualization
+- Timeline rendering with evidence links
+- Integration with schemakit's `navigable` profile
+- GitHub Actions for automated releases
+
 ## Links
 
 - [README](README.md)
+- [DESIGN_PRINCIPLES](DESIGN_PRINCIPLES.md)
 - [CHANGELOG](CHANGELOG.md)
 - [v0.1.0 Release Notes](RELEASE_NOTES_v0.1.0.md)
+- [Example: Premortem](examples/premortem-example.json)
+- [Example: Intra-Mortem](examples/intra-mortem-example.json)
+- [Example: Postmortem](examples/postmortem-example.json)

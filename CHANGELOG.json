@@ -10,20 +10,28 @@
       "version": "v0.2.0",
       "date": "2026-05-09",
       "highlights": [
+        { "description": "`ilspec init` command for scaffolding new incidents with phase-aware templates" },
+        { "description": "JSON Schema runtime validation with embedded schema" },
         { "description": "`ilspec validate` command for validating incident JSON files" },
-        { "description": "Premortem template for proactive failure simulation" },
-        { "description": "Unit tests for types and render packages" }
+        { "description": "Premortem template for proactive failure simulation" }
       ],
       "added": [
+        { "description": "`ilspec init` command with phase-aware templates and auto-generated IDs", "commit": "0348569" },
+        { "description": "JSON Schema runtime validation using santhosh-tekuri/jsonschema", "commit": "932f397" },
+        { "description": "`--schema-only` flag for JSON Schema validation only", "commit": "932f397" },
         { "description": "`ilspec validate` command with required field and enum validation", "commit": "b0b49ce" },
         { "description": "Premortem Markdown template with failure scenarios, early warning signals, and mitigations", "commit": "ce47e86" },
         { "description": "`RenderPremortem()` method in render package", "commit": "ce47e86" }
       ],
       "tests": [
+        { "description": "Unit tests for validate command: required fields, enums, nested structures", "commit": "c1aa0c1" },
+        { "description": "Unit tests for schema package: validator creation, validation methods", "commit": "c1aa0c1" },
         { "description": "Unit tests for types package: JSON round-trip, enum values", "commit": "75beb63" },
         { "description": "Unit tests for render package: template rendering, view helpers", "commit": "75beb63" }
       ],
       "documentation": [
+        { "description": "Premortem example JSON for proactive failure simulation", "commit": "471b732" },
+        { "description": "Postmortem example JSON for full incident analysis", "commit": "471b732" },
         { "description": "README updated with validate command usage", "commit": "7d6b397" }
       ],
       "build": [
