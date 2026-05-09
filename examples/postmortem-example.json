@@ -1,0 +1,208 @@
+{
+  "incident_id": "INC-2024-0087",
+  "title": "Authentication service outage affecting all users",
+  "phase": "postmortem",
+  "severity": "SEV0",
+  "status": "closed",
+  "created_at": "2024-02-20T08:15:00Z",
+  "updated_at": "2024-02-25T16:00:00Z",
+  "started_at": "2024-02-20T08:12:00Z",
+  "detected_at": "2024-02-20T08:15:00Z",
+  "mitigated_at": "2024-02-20T08:45:00Z",
+  "resolved_at": "2024-02-20T09:30:00Z",
+  "summary": "Complete authentication service outage lasting 33 minutes. All users were unable to log in or access authenticated endpoints. Root cause was an expired TLS certificate on the internal service mesh.",
+  "services_affected": [
+    "auth-service",
+    "api-gateway",
+    "user-service",
+    "session-service"
+  ],
+  "customer_impact_summary": "100% of users unable to log in or access any authenticated functionality for 33 minutes during peak morning hours (US East).",
+  "customer_impact_scope": "total",
+  "internal_impact_summary": "All internal tools requiring authentication were also unavailable. Support team unable to access customer data to respond to inquiries.",
+  "detection_method": "monitoring",
+  "detection_details": "PagerDuty alert triggered on auth-service error rate exceeding 50% threshold. Alert fired 3 minutes after first errors appeared.",
+  "root_cause": "Internal mTLS certificate for auth-service expired. Certificate was provisioned manually 2 years ago during initial service mesh setup and was not included in automated certificate rotation.",
+  "contributing_factors": [
+    "Manual certificate provisioning during initial setup bypassed automated rotation",
+    "No alerting on certificate expiration for internal services",
+    "Certificate inventory did not include internal service mesh certificates",
+    "Runbook for certificate rotation assumed all certs were in automated system"
+  ],
+  "prevention_gaps": [
+    "Certificate monitoring only covered external-facing certificates",
+    "Service mesh setup documentation did not mention manual certificate step",
+    "No periodic audit of certificate inventory completeness"
+  ],
+  "resolution_summary": "Rotated expired certificate manually, then added all internal certificates to automated rotation system. Verified all services recovered and sessions were restored.",
+  "what_went_well": [
+    "Detection was fast (3 minutes from first error to alert)",
+    "On-call engineer identified root cause within 10 minutes",
+    "Communication to stakeholders was clear and timely",
+    "Rollback was not needed - forward fix was straightforward"
+  ],
+  "what_went_wrong": [
+    "Certificate expiration was completely preventable",
+    "Initial investigation looked at wrong service (api-gateway) for 5 minutes",
+    "No documented process for emergency certificate rotation",
+    "Status page update was delayed by 15 minutes"
+  ],
+  "lessons_learned": [
+    "All certificates must be in automated rotation - no exceptions",
+    "Certificate monitoring must cover internal and external certs",
+    "Quarterly certificate inventory audits should be mandatory",
+    "Emergency certificate rotation runbook needed"
+  ],
+  "timeline": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2024-02-20T08:12:00Z",
+      "description": "First TLS handshake failures appear in auth-service logs",
+      "source": "monitoring",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2024-02-20T08:15:00Z",
+      "description": "PagerDuty alert fires: auth-service error rate > 50%",
+      "source": "automated",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2024-02-20T08:16:00Z",
+      "description": "On-call engineer acknowledges alert and begins investigation",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2024-02-20T08:21:00Z",
+      "description": "Initial focus on api-gateway - no issues found",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2024-02-20T08:26:00Z",
+      "description": "Identified TLS certificate expiration in auth-service mesh config",
+      "source": "human",
+      "confidence": "confirmed",
+      "evidence_ids": ["evi-001"]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2024-02-20T08:30:00Z",
+      "description": "Incident commander engaged, war room opened",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2024-02-20T08:45:00Z",
+      "description": "New certificate deployed, auth-service recovering",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2024-02-20T09:00:00Z",
+      "description": "All services healthy, error rates back to baseline",
+      "source": "monitoring",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-009",
+      "timestamp": "2024-02-20T09:30:00Z",
+      "description": "Incident resolved, monitoring confirmed stable",
+      "source": "human",
+      "confidence": "confirmed"
+    }
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "hyp-001",
+      "description": "API gateway configuration change caused auth failures",
+      "status": "invalidated",
+      "confidence": 0.0,
+      "validated_by_event_id": "evt-004"
+    },
+    {
+      "hypothesis_id": "hyp-002",
+      "description": "TLS certificate expiration in service mesh",
+      "status": "validated",
+      "confidence": 1.0,
+      "validated_by_event_id": "evt-005",
+      "evidence_ids": ["evi-001"]
+    }
+  ],
+  "action_items": [
+    {
+      "action_id": "act-001",
+      "description": "Add all internal certificates to automated rotation system",
+      "owner": "platform-team",
+      "priority": "P0",
+      "status": "done",
+      "due_date": "2024-02-21"
+    },
+    {
+      "action_id": "act-002",
+      "description": "Implement certificate expiration alerting for all certificates",
+      "owner": "sre-team",
+      "priority": "P0",
+      "status": "done",
+      "due_date": "2024-02-22"
+    },
+    {
+      "action_id": "act-003",
+      "description": "Create emergency certificate rotation runbook",
+      "owner": "sre-team",
+      "priority": "P1",
+      "status": "done",
+      "due_date": "2024-02-25"
+    },
+    {
+      "action_id": "act-004",
+      "description": "Conduct quarterly certificate inventory audit",
+      "owner": "security-team",
+      "priority": "P2",
+      "status": "open",
+      "due_date": "2024-03-31"
+    },
+    {
+      "action_id": "act-005",
+      "description": "Update service mesh documentation with certificate requirements",
+      "owner": "platform-team",
+      "priority": "P2",
+      "status": "done",
+      "due_date": "2024-02-28"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "evi-001",
+      "evidence_type": "log",
+      "description": "TLS handshake failure logs showing certificate expiration",
+      "source": "splunk",
+      "url": "https://splunk.example.com/app/search?q=auth-service-tls-errors",
+      "collected_at": "2024-02-20T08:26:00Z"
+    },
+    {
+      "evidence_id": "evi-002",
+      "evidence_type": "metric",
+      "description": "Error rate spike graph during incident",
+      "source": "datadog",
+      "url": "https://app.datadoghq.com/dashboard/auth-service?from=1708416720000",
+      "collected_at": "2024-02-20T10:00:00Z"
+    },
+    {
+      "evidence_id": "evi-003",
+      "evidence_type": "document",
+      "description": "Original service mesh setup ticket showing manual cert creation",
+      "source": "jira",
+      "url": "https://jira.example.com/browse/PLAT-1234",
+      "collected_at": "2024-02-20T14:00:00Z"
+    }
+  ],
+  "related_incident_ids": []
+}

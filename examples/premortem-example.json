@@ -1,0 +1,128 @@
+{
+  "incident_id": "PRE-2024-0015",
+  "title": "Database failover during peak traffic",
+  "phase": "premortem",
+  "severity": "SEV1",
+  "status": "hypothetical",
+  "created_at": "2024-03-01T10:00:00Z",
+  "updated_at": "2024-03-01T14:30:00Z",
+  "summary": "Proactive analysis of potential database failover scenarios during Black Friday traffic peaks. Our primary database has never been tested under 10x normal load with a simultaneous failover event.",
+  "services_affected": [
+    "primary-database",
+    "read-replicas",
+    "order-service",
+    "inventory-service",
+    "checkout-service"
+  ],
+  "customer_impact_summary": "If failover fails or takes too long, customers would see errors during checkout, potentially losing orders during peak revenue period.",
+  "customer_impact_scope": "significant",
+  "internal_impact_summary": "Engineering team would need all-hands response. Potential revenue loss in the millions.",
+  "contributing_factors": [
+    "Failover has never been tested under peak load conditions",
+    "Read replicas may not handle full write load if promoted",
+    "Connection pool settings optimized for normal traffic, not failover surge",
+    "Monitoring alerts tuned for gradual degradation, not sudden failover"
+  ],
+  "prevention_gaps": [
+    "No automated failover testing in production-like load",
+    "Runbook assumes operator availability within 5 minutes",
+    "No circuit breaker between application and database layer"
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "hyp-001",
+      "description": "Connection pool exhaustion during failover will cause cascading failures",
+      "status": "proposed",
+      "confidence": 0.7
+    },
+    {
+      "hypothesis_id": "hyp-002",
+      "description": "Read replica promotion will take longer than application timeout settings",
+      "status": "proposed",
+      "confidence": 0.6
+    },
+    {
+      "hypothesis_id": "hyp-003",
+      "description": "Monitoring will not detect partial failures fast enough",
+      "status": "proposed",
+      "confidence": 0.5
+    }
+  ],
+  "timeline": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2024-03-01T10:00:00Z",
+      "description": "Premortem session initiated for Black Friday readiness",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2024-03-01T11:00:00Z",
+      "description": "Historical analysis: last failover took 45 seconds under normal load",
+      "source": "human",
+      "confidence": "confirmed"
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2024-03-01T12:00:00Z",
+      "description": "Load test results reviewed: 10x traffic causes 3x connection pool usage",
+      "source": "human",
+      "confidence": "confirmed"
+    }
+  ],
+  "action_items": [
+    {
+      "action_id": "act-001",
+      "description": "Conduct failover drill under simulated peak load in staging",
+      "owner": "database-team",
+      "priority": "P0",
+      "status": "open",
+      "due_date": "2024-03-15",
+      "related_hypothesis_id": "hyp-001"
+    },
+    {
+      "action_id": "act-002",
+      "description": "Increase connection pool size and add circuit breaker",
+      "owner": "platform-team",
+      "priority": "P1",
+      "status": "open",
+      "due_date": "2024-03-20",
+      "related_hypothesis_id": "hyp-001"
+    },
+    {
+      "action_id": "act-003",
+      "description": "Reduce application database timeout from 30s to 10s",
+      "owner": "backend-team",
+      "priority": "P1",
+      "status": "open",
+      "due_date": "2024-03-10",
+      "related_hypothesis_id": "hyp-002"
+    },
+    {
+      "action_id": "act-004",
+      "description": "Add failover-specific alerting with 10-second detection threshold",
+      "owner": "sre-team",
+      "priority": "P1",
+      "status": "open",
+      "due_date": "2024-03-12",
+      "related_hypothesis_id": "hyp-003"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "evi-001",
+      "evidence_type": "document",
+      "description": "Last failover incident report (2023-06-15)",
+      "source": "confluence",
+      "url": "https://confluence.example.com/display/SRE/Failover+Incident+2023-06-15"
+    },
+    {
+      "evidence_id": "evi-002",
+      "evidence_type": "metric",
+      "description": "Connection pool utilization during last year's Black Friday",
+      "source": "datadog",
+      "url": "https://app.datadoghq.com/dashboard/db-pool-history"
+    }
+  ]
+}
