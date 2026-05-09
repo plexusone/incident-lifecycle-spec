@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/plexusone/incident-lifecycle-spec/pkg/render"
 	"github.com/plexusone/incident-lifecycle-spec/pkg/types"
+	"github.com/plexusone/incident-lifecycle-spec/pkg/visualize"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +17,7 @@ func renderCmd() *cobra.Command {
 		outputFile   string
 		templateName string
 		templateDir  string
+		diagrams     bool
 	)
 
 	cmd := &cobra.Command{
@@ -23,11 +26,14 @@ func renderCmd() *cobra.Command {
 		Long: `Render an incident JSON file to Markdown using the appropriate template.
 
 By default, the template is selected based on the incident phase:
-  - premortem    → premortem.md.tmpl (not yet implemented)
+  - premortem    → premortem.md.tmpl
   - intra_mortem → intra-mortem.md.tmpl
   - postmortem   → postmortem.md.tmpl
 
-You can override the template with --template.`,
+You can override the template with --template.
+
+Use --diagrams to embed D2 diagram code blocks in the output.
+These render natively on GitHub and GitLab.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFile := args[0]
@@ -57,6 +63,15 @@ You can override the template with --template.`,
 				return fmt.Errorf("rendering: %w", err)
 			}
 
+			// Append diagrams if requested
+			if diagrams {
+				diagramSection, err := generateDiagramSection(incident)
+				if err != nil {
+					return fmt.Errorf("generating diagrams: %w", err)
+				}
+				output = output + "\n" + diagramSection
+			}
+
 			outFile := outputFilename(outputFile, inputFile, incident.Phase)
 			if outFile == "-" {
 				fmt.Print(output)
@@ -74,8 +89,43 @@ You can override the template with --template.`,
 	cmd.Flags().StringVarP(&outputFile, "output", "o", "", "Output file (default: auto-generated, use '-' for stdout)")
 	cmd.Flags().StringVarP(&templateName, "template", "t", "", "Template name (default: auto-detect from phase)")
 	cmd.Flags().StringVar(&templateDir, "template-dir", "", "Directory containing custom templates")
+	cmd.Flags().BoolVar(&diagrams, "diagrams", false, "Embed D2 diagram code blocks in output")
 
 	return cmd
+}
+
+// generateDiagramSection creates D2 code blocks for hypothesis and timeline diagrams.
+func generateDiagramSection(incident *types.Incident) (string, error) {
+	vis := visualize.NewWithoutRenderer()
+
+	var sb strings.Builder
+	sb.WriteString("## Diagrams\n\n")
+
+	// Hypothesis lifecycle diagram
+	if len(incident.Hypotheses) > 0 {
+		sb.WriteString("### Hypothesis Lifecycle\n\n")
+		sb.WriteString("```d2\n")
+		d2Code, err := vis.Generate(incident, visualize.DiagramHypothesis)
+		if err != nil {
+			return "", err
+		}
+		sb.WriteString(d2Code)
+		sb.WriteString("```\n\n")
+	}
+
+	// Timeline diagram
+	if len(incident.Timeline) > 0 {
+		sb.WriteString("### Timeline\n\n")
+		sb.WriteString("```d2\n")
+		d2Code, err := vis.Generate(incident, visualize.DiagramTimeline)
+		if err != nil {
+			return "", err
+		}
+		sb.WriteString(d2Code)
+		sb.WriteString("```\n")
+	}
+
+	return sb.String(), nil
 }
 
 func templateForPhase(phase types.Phase) string {
