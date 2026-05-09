@@ -17,6 +17,7 @@ func main() {
 		Long:  "Tools for working with incident lifecycle artifacts (premortem, intra-mortem, postmortem)",
 	}
 
+	rootCmd.AddCommand(initCmd())
 	rootCmd.AddCommand(renderCmd())
 	rootCmd.AddCommand(validateCmd())
 	rootCmd.AddCommand(versionCmd())
