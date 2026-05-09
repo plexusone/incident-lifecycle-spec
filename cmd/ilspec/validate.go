@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/plexusone/incident-lifecycle-spec/pkg/schema"
 	"github.com/plexusone/incident-lifecycle-spec/pkg/types"
 	"github.com/spf13/cobra"
 )
 
 func validateCmd() *cobra.Command {
-	var quiet bool
+	var (
+		quiet      bool
+		schemaOnly bool
+	)
 
 	cmd := &cobra.Command{
 		Use:   "validate <incident.json>",
@@ -19,8 +23,8 @@ func validateCmd() *cobra.Command {
 incident lifecycle schema. Checks for:
 
   - Valid JSON syntax
-  - Required fields (incident_id, title, phase, severity, created_at)
-  - Valid enum values for phase, severity, status
+  - JSON Schema validation (structure, types, required fields)
+  - Go type validation (semantic checks, enum values)
   - Valid structure for timeline, hypotheses, action_items, evidence
 
 Exit codes:
@@ -35,6 +39,38 @@ Exit codes:
 				return fmt.Errorf("reading file: %w", err)
 			}
 
+			// JSON Schema validation
+			validator, err := schema.NewValidator()
+			if err != nil {
+				return fmt.Errorf("creating schema validator: %w", err)
+			}
+
+			schemaErrors, err := validator.ValidateBytesDetailed(data)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Invalid JSON: %v\n", err)
+				os.Exit(1)
+			}
+
+			if len(schemaErrors) > 0 {
+				for _, e := range schemaErrors {
+					if e.Path != "" {
+						fmt.Fprintf(os.Stderr, "Schema error at %s: %s\n", e.Path, e.Message)
+					} else {
+						fmt.Fprintf(os.Stderr, "Schema error: %s\n", e.Message)
+					}
+				}
+				os.Exit(1)
+			}
+
+			// Skip Go validation if only schema validation requested
+			if schemaOnly {
+				if !quiet {
+					fmt.Printf("✓ %s passes JSON Schema validation\n", inputFile)
+				}
+				return nil
+			}
+
+			// Go type validation for additional semantic checks
 			var incident types.Incident
 			if err := json.Unmarshal(data, &incident); err != nil {
 				fmt.Fprintf(os.Stderr, "Invalid JSON: %v\n", err)
@@ -63,6 +99,7 @@ Exit codes:
 	}
 
 	cmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Suppress output on success")
+	cmd.Flags().BoolVar(&schemaOnly, "schema-only", false, "Only run JSON Schema validation (skip Go type validation)")
 
 	return cmd
 }
