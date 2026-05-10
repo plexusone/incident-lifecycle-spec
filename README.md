@@ -162,6 +162,27 @@ ilspec validate incident.json -q
 
 ```bash
 schemakit lint --property-case snake_case schema/incident.schema.json
+
+# Use navigable profile for human-reviewable schema checks
+schemakit lint --profile navigable --property-case snake_case schema/incident.schema.json
+```
+
+### Visualize incident data
+
+Generate D2 diagrams showing hypothesis lifecycle and timeline:
+
+```bash
+# Generate hypothesis lifecycle diagram (D2 code to stdout)
+ilspec visualize incident.json --type hypothesis
+
+# Generate timeline diagram as SVG
+ilspec visualize incident.json --type timeline --format svg -o timeline.svg
+
+# Generate all diagrams
+ilspec visualize incident.json --type all -o diagrams.d2
+
+# Embed diagrams in rendered Markdown
+ilspec render incident.json --diagrams
 ```
 
 ## Schema Overview

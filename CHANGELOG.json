@@ -7,6 +7,28 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.3.0",
+      "date": "2026-05-09",
+      "highlights": [
+        { "description": "D2 diagram visualization for hypothesis lifecycle and timeline" },
+        { "description": "`ilspec visualize` command for generating D2/SVG diagrams" },
+        { "description": "`--diagrams` flag to embed D2 code blocks in rendered Markdown" }
+      ],
+      "added": [
+        { "description": "`pkg/visualize` package for D2 diagram generation using d2vision", "commit": "d8ca3d6" },
+        { "description": "`ilspec visualize` command with `--type hypothesis|timeline|all` and `--format d2|svg`", "commit": "493cd45" },
+        { "description": "`--diagrams` flag for `ilspec render` to embed D2 code blocks", "commit": "7b7a78c" },
+        { "description": "Hypothesis lifecycle diagram showing state transitions (proposed → investigating → validated)", "commit": "d8ca3d6" },
+        { "description": "Timeline diagram with evidence links and event source shapes", "commit": "d8ca3d6" }
+      ],
+      "tests": [
+        { "description": "Unit tests for visualize package: diagram generation, rendering", "commit": "d8ca3d6" }
+      ],
+      "dependencies": [
+        { "description": "github.com/grokify/d2vision for D2 code generation and SVG rendering", "commit": "7b7a78c" }
+      ]
+    },
+    {
       "version": "v0.2.0",
       "date": "2026-05-09",
       "highlights": [
